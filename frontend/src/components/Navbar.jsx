@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import { assets } from '../assets/assets.js'
 import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext.jsx';
@@ -7,7 +7,9 @@ import axios from 'axios';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { userData, backendUrl, setUserData, setIsLoggedIn } = useContext(AppContext)
+  const { userData, backendUrl, setUserData, setIsLoggedIn } = useContext(AppContext);
+  const [showMenu, setShowMenu] = React.useState(false);
+  const menuRef = useRef(null);
 
   const sendVerificationOtp = async () => {
     try{
@@ -23,6 +25,7 @@ const Navbar = () => {
       toast.error(error.message);
     };
   }
+
   const logout = async () => {
     try{
       axios.defaults.withCredentials = true;
@@ -34,15 +37,29 @@ const Navbar = () => {
       toast.error(error.message);
     };
   }
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className='w-full flex justify-between items-center p-4 sm:p-6 sm:px-24 absolute top-0 bg-white'>
       <img src={assets.logo} alt="logo" className='w-28 sm:w-32' />
       {userData ? (
-        <div className='relative'>
+        <div className='relative' ref={menuRef} onClick={() => setShowMenu(!showMenu)}>
           <div className='w-8 h-8 flex justify-center items-center rounded-full bg-black text-white cursor-pointer'>
             {userData.name[0].toUpperCase()}
           </div>
-          <div className='absolute hidden group-hover:block top-10 right-0 z-10 text-black rounded bg-gray-100'>
+          <div className={`absolute ${showMenu ? 'block' : 'hidden'} top-10 right-0 z-10 text-black rounded bg-gray-100`}>
             <ul className='list-none m-0 p-2 text-sm'>
               {!userData.isAccountVerified && (
                 <li onClick={sendVerificationOtp} className='py-1 px-2 hover:bg-gray-200 cursor-pointer'>
