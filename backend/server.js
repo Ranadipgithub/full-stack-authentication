@@ -11,7 +11,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 connectDB();
 
-const allowedOrigins = ["https://full-stack-authentication.vercel.app"];
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "https://full-stack-authentication.vercel.app",
+];
 
 app.use(express.json());
 app.use(cors({origin: allowedOrigins,credentials:true}));
