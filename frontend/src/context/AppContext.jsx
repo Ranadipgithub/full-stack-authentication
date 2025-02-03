@@ -31,7 +31,8 @@ export const AppContextProvider = (props) => {
                 getUserData();
             }
         } catch(err){
-            toast.error(err.message);
+            // toast.error(err.message);
+            console.log(err);
         }
     }
 
